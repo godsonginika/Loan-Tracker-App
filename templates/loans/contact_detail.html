@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ contact.name }} - Loan Tracker{% endblock %}
+
+{% block content %}
+    <h1>{{ contact.name }}</h1>
+    <p>Email: {{ contact.email }}</p>
+    <p>Phone: {{ contact.phone }}</p>
+    <a href="{% url 'edit_contact' contact.pk %}">Edit</a>
+    <a href="{% url 'delete_contact' contact.pk %}">Delete</a>
+
+    <h2>Loans</h2>
+    {% if loans %}
+        {% for loan in loans %}
+            <div>
+                <p>{{ loan.principal }} — {{ loan.get_direction_display }}</p>
+                <p>Status: {{ loan.get_status_display }}</p>
+                <p>Balance: {{ loan.balance }}</p>
+                <a href="{% url 'loan_detail' loan.pk %}">View</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No loans with this contact yet.</p>
+    {% endif %}
+{% endblock %}

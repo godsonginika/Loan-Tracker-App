@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Contacts - Loan Tracker{% endblock %}
+
+{% block nav_contacts %}active{% endblock %}
+
+{% block content %}
+    <h1>Contacts</h1>
+    <a href="{% url 'create_contact' %}">Add Contact</a>
+
+    {% if contacts %}
+        {% for contact in contacts %}
+            <div>
+                <p>{{ contact.name }}</p>
+                <p>{{ contact.email }}</p>
+                <p>{{ contact.phone }}</p>
+                <a href="{% url 'contact_detail' contact.pk %}">View</a>
+                <a href="{% url 'edit_contact' contact.pk %}">Edit</a>
+                <a href="{% url 'delete_contact' contact.pk %}">Delete</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No contacts yet. <a href="{% url 'create_contact' %}">Add one</a></p>
+    {% endif %}
+{% endblock %}

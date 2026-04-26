@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Loan Tracker{% endblock %}
+
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+    <h1>Welcome, {{ user.username }}!</h1>
+
+    <div>
+        <h2>Summary</h2>
+        <p>Total Lent: {{ total_lent }}</p>
+        <p>Total Borrowed: {{ total_borrowed }}</p>
+        <p>Active Loans: {{ active_loans }}</p>
+    </div>
+
+    {% if overdue_loans %}
+        <div>
+            <h2>Overdue Loans</h2>
+            {% for loan in overdue_loans %}
+                <p>
+                    {{ loan.contact.name }} — {{ loan.balance }} 
+                    (Due: {{ loan.due_date }})
+                    <a href="{% url 'loan_detail' loan.pk %}">View</a>
+                </p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div>
+        <h2>Recent Loans</h2>
+        {% if recent_loans %}
+            {% for loan in recent_loans %}
+                <p>
+                    {{ loan.contact.name }} — {{ loan.principal }}
+                    ({{ loan.get_direction_display }})
+                    <a href="{% url 'loan_detail' loan.pk %}">View</a>
+                </p>
+            {% endfor %}
+        {% else %}
+            <p>No loans yet. <a href="{% url 'add_loan' %}">Add one</a></p>
+        {% endif %}
+    </div>
+{% endblock %}

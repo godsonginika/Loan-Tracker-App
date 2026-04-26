@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Loans - Loan Tracker{% endblock %}
+
+{% block nav_loans %}active{% endblock %}
+
+{% block content %}
+    <h1>Loans</h1>
+    <a href="{% url 'add_loan' %}">Add Loan</a>
+
+    {% if loans %}
+        {% for loan in loans %}
+            <div>
+                <p>{{ loan.contact.name }} — {{ loan.principal }}</p>
+                <p>Direction: {{ loan.get_direction_display }}</p>
+                <p>Status: {{ loan.get_status_display }}</p>
+                <p>Balance: {{ loan.balance }}</p>
+                <a href="{% url 'loan_detail' loan.pk %}">View</a>
+                <a href="{% url 'edit_loan' loan.pk %}">Edit</a>
+                <a href="{% url 'delete_loan' loan.pk %}">Delete</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No loans yet. <a href="{% url 'add_loan' %}">Add one</a></p>
+    {% endif %}
+
+    <h2>Loan History</h2>
+    {% if paid_loans %}
+        {% for loan in paid_loans %}
+            <div>
+                <p>{{ loan.contact.name }} — {{ loan.principal }}</p>
+                <p>Direction: {{ loan.get_direction_display }}</p>
+                <a href="{% url 'loan_detail' loan.pk %}">View</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No paid loans yet.</p>
+    {% endif %}
+
+{% endblock %}

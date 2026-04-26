@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Loan Detail - Loan Tracker{% endblock %}
+
+{% block content %}
+    <h1>Loan with {{ loan.contact.name }}</h1>
+    <p>Direction: {{ loan.get_direction_display }}</p>
+    <p>Principal: {{ loan.principal }}</p>
+    <p>Interest Rate: {{ loan.interest_rate }}%</p>
+    <p>Loan Date: {{ loan.loan_date }}</p>
+    <p>Due Date: {{ loan.due_date }}</p>
+    <p>Status: {{ loan.get_status_display }}</p>
+    <p>Total Owed (with interest): {{ loan.total_owed }}</p>
+    <p>Amount Paid: {{ loan.amount_paid }}</p>
+    <p>Balance: {{ loan.balance }}</p>
+    <a href="{% url 'edit_loan' loan.pk %}">Edit</a>
+    <a href="{% url 'delete_loan' loan.pk %}">Delete</a>
+    <a href="{% url 'add_payment' loan.pk %}">Add Payment</a>
+
+    <h2>Payment History</h2>
+    {% if payments %}
+        {% for payment in payments %}
+            <div>
+                <p>{{ payment.amount }} on {{ payment.date }}</p>
+                <p>{{ payment.note }}</p>
+                <a href="{% url 'edit_payment' payment.pk %}">Edit</a>
+                <a href="{% url 'delete_payment' payment.pk %}">Delete</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No payments yet.</p>
+    {% endif %}
+{% endblock %}
