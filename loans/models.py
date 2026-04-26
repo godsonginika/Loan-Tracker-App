@@ -71,7 +71,7 @@ class Loan(models.Model):
         super().save(*args, **kwargs)
     
     def is_overdue(self):
-        if self.due_date and self.status == 'active':
+        if self.due_date and self.status != 'paid':
             return self.due_date < timezone.now().date()
         return False
     

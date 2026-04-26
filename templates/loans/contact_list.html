@@ -1,25 +1,68 @@
 {% extends 'base.html' %}
-
-{% block title %}Contacts - Loan Tracker{% endblock %}
-
 {% block nav_contacts %}active{% endblock %}
+{% block page_title %}Contacts{% endblock %}
 
 {% block content %}
-    <h1>Contacts</h1>
-    <a href="{% url 'create_contact' %}">Add Contact</a>
 
-    {% if contacts %}
-        {% for contact in contacts %}
-            <div>
-                <p>{{ contact.name }}</p>
-                <p>{{ contact.email }}</p>
-                <p>{{ contact.phone }}</p>
-                <a href="{% url 'contact_detail' contact.pk %}">View</a>
-                <a href="{% url 'edit_contact' contact.pk %}">Edit</a>
-                <a href="{% url 'delete_contact' contact.pk %}">Delete</a>
-            </div>
-        {% endfor %}
-    {% else %}
-        <p>No contacts yet. <a href="{% url 'create_contact' %}">Add one</a></p>
-    {% endif %}
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Contacts</h4>
+        <p class="text-muted mb-0" style="font-size:0.9rem;">People you lend to or borrow from</p>
+    </div>
+    <a href="{% url 'create_contact' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i> Add Contact
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        {% if contacts %}
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contact in contacts %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="user-avatar" style="width:32px; height:32px; font-size:0.85rem;">
+                                {{ contact.name|first|upper }}
+                            </div>
+                            <strong>{{ contact.name }}</strong>
+                        </div>
+                    </td>
+                    <td>{{ contact.email|default:"—" }}</td>
+                    <td>{{ contact.phone|default:"—" }}</td>
+                    <td>
+                        <a href="{% url 'contact_detail' contact.pk %}" class="btn btn-sm btn-outline-primary me-1">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{% url 'edit_contact' contact.pk %}" class="btn btn-sm btn-outline-secondary me-1">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'delete_contact' contact.pk %}" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-people" style="font-size:2.5rem; color:#cbd5e0;"></i>
+            <p class="text-muted mt-2">No contacts yet.</p>
+            <a href="{% url 'create_contact' %}" class="btn btn-primary btn-sm">Add your first contact</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
 {% endblock %}

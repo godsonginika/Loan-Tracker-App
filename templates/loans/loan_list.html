@@ -1,40 +1,117 @@
 {% extends 'base.html' %}
-
-{% block title %}Loans - Loan Tracker{% endblock %}
-
 {% block nav_loans %}active{% endblock %}
+{% block page_title %}Loans{% endblock %}
 
 {% block content %}
-    <h1>Loans</h1>
-    <a href="{% url 'add_loan' %}">Add Loan</a>
 
-    {% if loans %}
-        {% for loan in loans %}
-            <div>
-                <p>{{ loan.contact.name }} — {{ loan.principal }}</p>
-                <p>Direction: {{ loan.get_direction_display }}</p>
-                <p>Status: {{ loan.get_status_display }}</p>
-                <p>Balance: {{ loan.balance }}</p>
-                <a href="{% url 'loan_detail' loan.pk %}">View</a>
-                <a href="{% url 'edit_loan' loan.pk %}">Edit</a>
-                <a href="{% url 'delete_loan' loan.pk %}">Delete</a>
-            </div>
-        {% endfor %}
-    {% else %}
-        <p>No loans yet. <a href="{% url 'add_loan' %}">Add one</a></p>
-    {% endif %}
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">My Loans</h4>
+        <p class="text-muted mb-0" style="font-size:0.9rem;">Manage all your loans in one place</p>
+    </div>
+    <a href="{% url 'add_loan' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i> Add Loan
+    </a>
+</div>
 
-    <h2>Loan History</h2>
-    {% if paid_loans %}
-        {% for loan in paid_loans %}
-            <div>
-                <p>{{ loan.contact.name }} — {{ loan.principal }}</p>
-                <p>Direction: {{ loan.get_direction_display }}</p>
-                <a href="{% url 'loan_detail' loan.pk %}">View</a>
-            </div>
-        {% endfor %}
-    {% else %}
-        <p>No paid loans yet.</p>
-    {% endif %}
+<!-- Active Loans -->
+<div class="card mb-4">
+    <div class="card-header">Active & Overdue Loans</div>
+    <div class="card-body p-0">
+        {% if loans %}
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Contact</th>
+                    <th>Principal</th>
+                    <th>Balance</th>
+                    <th>Direction</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for loan in loans %}
+                <tr>
+                    <td><strong>{{ loan.contact.name }}</strong></td>
+                    <td>₦{{ loan.principal }}</td>
+                    <td>₦{{ loan.balance }}</td>
+                    <td>{{ loan.get_direction_display }}</td>
+                    <td>{{ loan.due_date|default:"—" }}</td>
+                    <td>
+                        {% if loan.status == 'active' %}
+                            <span class="badge-active">Active</span>
+                        {% elif loan.status == 'overdue' %}
+                            <span class="badge-overdue">Overdue</span>
+                        {% else %}
+                            <span class="badge-paid">Paid</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'loan_detail' loan.pk %}" class="btn btn-sm btn-outline-primary me-1">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{% url 'edit_loan' loan.pk %}" class="btn btn-sm btn-outline-secondary me-1">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'delete_loan' loan.pk %}" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-cash-stack" style="font-size:2.5rem; color:#cbd5e0;"></i>
+            <p class="text-muted mt-2">No active loans yet.</p>
+            <a href="{% url 'add_loan' %}" class="btn btn-primary btn-sm">Add your first loan</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Loan History -->
+<div class="card">
+    <div class="card-header">Loan History</div>
+    <div class="card-body p-0">
+        {% if paid_loans %}
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Contact</th>
+                    <th>Principal</th>
+                    <th>Direction</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for loan in paid_loans %}
+                <tr>
+                    <td><strong>{{ loan.contact.name }}</strong></td>
+                    <td>₦{{ loan.principal }}</td>
+                    <td>{{ loan.get_direction_display }}</td>
+                    <td><span class="badge-paid">Paid</span></td>
+                    <td>
+                        <a href="{% url 'loan_detail' loan.pk %}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-check-circle" style="font-size:2.5rem; color:#cbd5e0;"></i>
+            <p class="text-muted mt-2">No paid loans yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
 
 {% endblock %}

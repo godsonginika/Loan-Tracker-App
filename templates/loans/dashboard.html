@@ -1,44 +1,136 @@
 {% extends 'base.html' %}
-
-{% block title %}Dashboard - Loan Tracker{% endblock %}
-
 {% block nav_dashboard %}active{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
 
 {% block content %}
-    <h1>Welcome, {{ user.username }}!</h1>
 
-    <div>
-        <h2>Summary</h2>
-        <p>Total Lent: {{ total_lent }}</p>
-        <p>Total Borrowed: {{ total_borrowed }}</p>
-        <p>Active Loans: {{ active_loans }}</p>
-    </div>
-
-    {% if overdue_loans %}
-        <div>
-            <h2>Overdue Loans</h2>
-            {% for loan in overdue_loans %}
-                <p>
-                    {{ loan.contact.name }} — {{ loan.balance }} 
-                    (Due: {{ loan.due_date }})
-                    <a href="{% url 'loan_detail' loan.pk %}">View</a>
-                </p>
-            {% endfor %}
+<!-- Stat Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card green">
+            <div class="stat-label">Total Lent</div>
+            <div class="stat-value">₦{{ total_lent }}</div>
+            <i class="bi bi-arrow-up-circle stat-icon"></i>
         </div>
-    {% endif %}
-
-    <div>
-        <h2>Recent Loans</h2>
-        {% if recent_loans %}
-            {% for loan in recent_loans %}
-                <p>
-                    {{ loan.contact.name }} — {{ loan.principal }}
-                    ({{ loan.get_direction_display }})
-                    <a href="{% url 'loan_detail' loan.pk %}">View</a>
-                </p>
-            {% endfor %}
-        {% else %}
-            <p>No loans yet. <a href="{% url 'add_loan' %}">Add one</a></p>
-        {% endif %}
     </div>
+    <div class="col-md-3">
+        <div class="stat-card red">
+            <div class="stat-label">Total Borrowed</div>
+            <div class="stat-value">₦{{ total_borrow }}</div>
+            <i class="bi bi-arrow-down-circle stat-icon"></i>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card blue">
+            <div class="stat-label">Active Loans</div>
+            <div class="stat-value">{{ active_loans }}</div>
+            <i class="bi bi-cash-stack stat-icon"></i>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card orange">
+            <div class="stat-label">Overdue Loans</div>
+            <div class="stat-value">{{ overdue_loans|length }}</div>
+            <i class="bi bi-exclamation-circle stat-icon"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Overdue Alert -->
+{% if overdue_loans %}
+<div class="alert d-flex align-items-center mb-4" style="background:#fff0f3; border: 1px solid #fc5c7d; border-radius: 12px;">
+    <i class="bi bi-exclamation-triangle-fill me-3" style="color:#fc5c7d; font-size:1.3rem;"></i>
+    <div>
+        <strong style="color:#fc5c7d;">You have {{ overdue_loans|length }} overdue loan(s)!</strong>
+        <span class="text-muted ms-2" style="font-size:0.9rem;">Please follow up on these immediately.</span>
+    </div>
+</div>
+{% endif %}
+
+<div class="row g-4">
+    <!-- Recent Loans -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Recent Loans</span>
+                <a href="{% url 'loan_list' %}" class="btn btn-sm btn-primary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_loans %}
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Contact</th>
+                            <th>Amount</th>
+                            <th>Direction</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for loan in recent_loans %}
+                        <tr>
+                            <td>
+                                <strong>{{ loan.contact.name }}</strong>
+                            </td>
+                            <td>₦{{ loan.principal }}</td>
+                            <td>{{ loan.get_direction_display }}</td>
+                            <td>
+                                {% if loan.status == 'active' %}
+                                    <span class="badge-active">Active</span>
+                                {% elif loan.status == 'overdue' %}
+                                    <span class="badge-overdue">Overdue</span>
+                                {% else %}
+                                    <span class="badge-paid">Paid</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'loan_detail' loan.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-cash-stack" style="font-size:2.5rem; color:#cbd5e0;"></i>
+                    <p class="text-muted mt-2">No loans yet.</p>
+                    <a href="{% url 'add_loan' %}" class="btn btn-primary btn-sm">Add your first loan</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Overdue Loans -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                Overdue Loans
+            </div>
+            <div class="card-body p-0">
+                {% if overdue_loans %}
+                    {% for loan in overdue_loans %}
+                    <div class="d-flex justify-content-between align-items-center px-3 py-3" style="border-bottom: 1px solid #e2e8f0;">
+                        <div>
+                            <div class="fw-semibold">{{ loan.contact.name }}</div>
+                            <div class="text-muted" style="font-size:0.82rem;">Due: {{ loan.due_date }}</div>
+                        </div>
+                        <div class="text-end">
+                            <div style="color:#fc5c7d; font-weight:600;">₦{{ loan.balance }}</div>
+                            <a href="{% url 'loan_detail' loan.pk %}" style="font-size:0.8rem; color: var(--primary);">View</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle" style="font-size:2.5rem; color:#00c896;"></i>
+                    <p class="text-muted mt-2" style="font-size:0.9rem;">No overdue loans!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

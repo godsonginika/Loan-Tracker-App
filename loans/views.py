@@ -171,13 +171,13 @@ def dashboard(request):
     loans = Loan.objects.filter(owner=request.user)
     
     total_lent = loans.filter(direction='lent').aggregate(Sum('principal'))['principal__sum'] or 0
-    total_borrowed = loans.filter(direction='borrowed').aggregate(Sum('principal'))['principal__sum'] or 0
+    total_borrowed = loans.filter(direction='borrow').aggregate(Sum('principal'))['principal__sum'] or 0
     active_loans = loans.filter(status='active').count()
     overdue_loans = [loan for loan in loans if loan.is_overdue()]
 
     context = {
         'total_lent': total_lent,
-        'total_borrowed': total_borrowed,
+        'total_borrow': total_borrowed,
         'active_loans': active_loans,
         'overdue_loans': overdue_loans,
         'recent_loans': loans.order_by('-created_at')[:5]

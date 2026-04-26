@@ -1,25 +1,101 @@
 {% extends 'base.html' %}
-
-{% block title %}{{ contact.name }} - Loan Tracker{% endblock %}
+{% block nav_contacts %}active{% endblock %}
+{% block page_title %}Contact Detail{% endblock %}
 
 {% block content %}
-    <h1>{{ contact.name }}</h1>
-    <p>Email: {{ contact.email }}</p>
-    <p>Phone: {{ contact.phone }}</p>
-    <a href="{% url 'edit_contact' contact.pk %}">Edit</a>
-    <a href="{% url 'delete_contact' contact.pk %}">Delete</a>
 
-    <h2>Loans</h2>
-    {% if loans %}
-        {% for loan in loans %}
-            <div>
-                <p>{{ loan.principal }} — {{ loan.get_direction_display }}</p>
-                <p>Status: {{ loan.get_status_display }}</p>
-                <p>Balance: {{ loan.balance }}</p>
-                <a href="{% url 'loan_detail' loan.pk %}">View</a>
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center gap-3">
+        <div class="user-avatar" style="width:50px; height:50px; font-size:1.3rem;">
+            {{ contact.name|first|upper }}
+        </div>
+        <div>
+            <h4 class="fw-bold mb-0">{{ contact.name }}</h4>
+            <p class="text-muted mb-0" style="font-size:0.9rem;">{{ contact.email|default:"No email" }}</p>
+        </div>
+    </div>
+    <div>
+        <a href="{% url 'edit_contact' contact.pk %}" class="btn btn-outline-secondary me-2">
+            <i class="bi bi-pencil me-1"></i> Edit
+        </a>
+        <a href="{% url 'delete_contact' contact.pk %}" class="btn btn-outline-danger">
+            <i class="bi bi-trash me-1"></i> Delete
+        </a>
+    </div>
+</div>
+
+<!-- Contact Info -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Contact Info</div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <p class="text-muted mb-1" style="font-size:0.82rem;">EMAIL</p>
+                    <p class="fw-semibold mb-0">{{ contact.email|default:"—" }}</p>
+                </div>
+                <div>
+                    <p class="text-muted mb-1" style="font-size:0.82rem;">PHONE</p>
+                    <p class="fw-semibold mb-0">{{ contact.phone|default:"—" }}</p>
+                </div>
             </div>
-        {% endfor %}
-    {% else %}
-        <p>No loans with this contact yet.</p>
-    {% endif %}
+        </div>
+    </div>
+
+    <!-- Loans with this contact -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Loans with {{ contact.name }}</span>
+                <a href="{% url 'add_loan' %}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-plus-lg me-1"></i> Add Loan
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if loans %}
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Principal</th>
+                            <th>Balance</th>
+                            <th>Direction</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for loan in loans %}
+                        <tr>
+                            <td>₦{{ loan.principal }}</td>
+                            <td>₦{{ loan.balance }}</td>
+                            <td>{{ loan.get_direction_display }}</td>
+                            <td>
+                                {% if loan.status == 'active' %}
+                                    <span class="badge-active">Active</span>
+                                {% elif loan.status == 'overdue' %}
+                                    <span class="badge-overdue">Overdue</span>
+                                {% else %}
+                                    <span class="badge-paid">Paid</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'loan_detail' loan.pk %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="text-center py-4">
+                    <p class="text-muted mb-0">No loans with this contact yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

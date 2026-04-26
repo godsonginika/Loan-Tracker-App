@@ -1,33 +1,141 @@
 {% extends 'base.html' %}
-
-{% block title %}Loan Detail - Loan Tracker{% endblock %}
+{% block nav_loans %}active{% endblock %}
+{% block page_title %}Loan Detail{% endblock %}
 
 {% block content %}
-    <h1>Loan with {{ loan.contact.name }}</h1>
-    <p>Direction: {{ loan.get_direction_display }}</p>
-    <p>Principal: {{ loan.principal }}</p>
-    <p>Interest Rate: {{ loan.interest_rate }}%</p>
-    <p>Loan Date: {{ loan.loan_date }}</p>
-    <p>Due Date: {{ loan.due_date }}</p>
-    <p>Status: {{ loan.get_status_display }}</p>
-    <p>Total Owed (with interest): {{ loan.total_owed }}</p>
-    <p>Amount Paid: {{ loan.amount_paid }}</p>
-    <p>Balance: {{ loan.balance }}</p>
-    <a href="{% url 'edit_loan' loan.pk %}">Edit</a>
-    <a href="{% url 'delete_loan' loan.pk %}">Delete</a>
-    <a href="{% url 'add_payment' loan.pk %}">Add Payment</a>
 
-    <h2>Payment History</h2>
-    {% if payments %}
-        {% for payment in payments %}
-            <div>
-                <p>{{ payment.amount }} on {{ payment.date }}</p>
-                <p>{{ payment.note }}</p>
-                <a href="{% url 'edit_payment' payment.pk %}">Edit</a>
-                <a href="{% url 'delete_payment' payment.pk %}">Delete</a>
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Loan with {{ loan.contact.name }}</h4>
+        <p class="text-muted mb-0" style="font-size:0.9rem;">
+            Created on {{ loan.created_at|date:"M d, Y" }}
+        </p>
+    </div>
+    <div>
+        <a href="{% url 'edit_loan' loan.pk %}" class="btn btn-outline-secondary me-2">
+            <i class="bi bi-pencil me-1"></i> Edit
+        </a>
+        <a href="{% url 'delete_loan' loan.pk %}" class="btn btn-outline-danger">
+            <i class="bi bi-trash me-1"></i> Delete
+        </a>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Loan Info -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">Loan Details</div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <p class="text-muted mb-1" style="font-size:0.82rem;">DIRECTION</p>
+                        <p class="fw-semibold mb-0">{{ loan.get_direction_display }}</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="text-muted mb-1" style="font-size:0.82rem;">STATUS</p>
+                        <p class="mb-0">
+                            {% if loan.status == 'active' %}
+                                <span class="badge-active">Active</span>
+                            {% elif loan.status == 'overdue' %}
+                                <span class="badge-overdue">Overdue</span>
+                            {% else %}
+                                <span class="badge-paid">Paid</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-6">
+                        <p class="text-muted mb-1" style="font-size:0.82rem;">PRINCIPAL</p>
+                        <p class="fw-semibold mb-0">₦{{ loan.principal }}</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="text-muted mb-1" style="font-size:0.82rem;">INTEREST RATE</p>
+                        <p class="fw-semibold mb-0">{{ loan.interest_rate }}%</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="text-muted mb-1" style="font-size:0.82rem;">LOAN DATE</p>
+                        <p class="fw-semibold mb-0">{{ loan.loan_date|date:"M d, Y" }}</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="text-muted mb-1" style="font-size:0.82rem;">DUE DATE</p>
+                        <p class="fw-semibold mb-0">{{ loan.due_date|date:"M d, Y"|default:"—" }}</p>
+                    </div>
+                    <div class="col-12">
+                        <p class="text-muted mb-1" style="font-size:0.82rem;">DESCRIPTION</p>
+                        <p class="fw-semibold mb-0">{{ loan.description|default:"—" }}</p>
+                    </div>
+                </div>
             </div>
-        {% endfor %}
-    {% else %}
-        <p>No payments yet.</p>
-    {% endif %}
+        </div>
+    </div>
+
+    <!-- Balance Summary -->
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header">Balance Summary</div>
+            <div class="card-body">
+                <div class="mb-3 pb-3" style="border-bottom: 1px solid #e2e8f0;">
+                    <p class="text-muted mb-1" style="font-size:0.82rem;">TOTAL OWED</p>
+                    <p class="fw-bold mb-0" style="font-size:1.4rem;">₦{{ loan.total_owed }}</p>
+                </div>
+                <div class="mb-3 pb-3" style="border-bottom: 1px solid #e2e8f0;">
+                    <p class="text-muted mb-1" style="font-size:0.82rem;">AMOUNT PAID</p>
+                    <p class="fw-bold mb-0" style="font-size:1.4rem; color:#00c896;">₦{{ loan.amount_paid }}</p>
+                </div>
+                <div class="mb-4">
+                    <p class="text-muted mb-1" style="font-size:0.82rem;">BALANCE</p>
+                    <p class="fw-bold mb-0" style="font-size:1.4rem; color:#fc5c7d;">₦{{ loan.balance }}</p>
+                </div>
+                {% if loan.status != 'paid' %}
+                <a href="{% url 'add_payment' loan.pk %}" class="btn btn-primary w-100">
+                    <i class="bi bi-plus-lg me-1"></i> Add Payment
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment History -->
+<div class="card">
+    <div class="card-header">Payment History</div>
+    <div class="card-body p-0">
+        {% if payments %}
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Note</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                <tr>
+                    <td>{{ payment.date|date:"M d, Y" }}</td>
+                    <td>₦{{ payment.amount }}</td>
+                    <td>{{ payment.note|default:"—" }}</td>
+                    <td>
+                        <a href="{% url 'edit_payment' payment.pk %}" class="btn btn-sm btn-outline-secondary me-1">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'delete_payment' payment.pk %}" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-clock-history" style="font-size:2.5rem; color:#cbd5e0;"></i>
+            <p class="text-muted mt-2">No payments recorded yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
 {% endblock %}
