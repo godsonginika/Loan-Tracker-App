@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .forms import RegisterUser
 from django.http import HttpResponse
@@ -13,9 +13,9 @@ from django.db.models import Sum
 def register(request):
     if request.method == 'POST':
         form = RegisterUser(request.POST)
-        if form.is_valid:
+        if form.is_valid():
             user = form.save()
-            return HttpResponse('User Created Successfully!')
+            return redirect('login')
     else:
         form = RegisterUser(request.POST)
 
@@ -101,6 +101,12 @@ class LoanCreateView(LoginRequiredMixin, CreateView):
     template_name = 'loans/loan_form.html'
     success_url = reverse_lazy('loan_list')
 
+    # Pass the logged in user to the form so it can filter the contact dropdown
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+    
     def form_valid(self, form):
         form.instance.owner = self.request.user
         return super().form_valid(form)
@@ -111,6 +117,12 @@ class LoanUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'loans/loan_form.html'
     success_url = reverse_lazy('loan_list')
 
+    # Pass the logged in user to the form so it can filter the contact dropdown
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+    
     def get_queryset(self):
         return Loan.objects.filter(owner=self.request.user)
 
@@ -199,7 +211,7 @@ def contact_list(request):
 def create_contact(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
-        if form.is_valid:
+        if form.is_valid():
             contact = form.save(commit=False)
             contact.owner = request.user
             contact.save()
@@ -219,7 +231,7 @@ def update_contact(request, pk):
     contact = get_object_or_404(Contact, pk=pk, owner=request.user)
     if request.method == 'POST':
         form = ContactForm(request.POST, instance=contact)
-        if form.is_valid:
+        if form.is_valid():
             form.save()
             return redirect('contact_detail', pk=contact.pk)
     else:

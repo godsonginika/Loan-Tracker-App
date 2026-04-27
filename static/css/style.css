@@ -263,3 +263,17 @@ body { font-family: 'Segoe UI', sans-serif; background: var(--main-bg); color: v
     .main-content { margin-left: 0; }
     .wrapper { flex-direction: column; }
 }
+
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.15);
+    outline: none;
+}

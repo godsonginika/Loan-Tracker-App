@@ -6,7 +6,7 @@
         <i class="bi bi-currency-dollar"></i>
         LoanTracker
     </div>
-    <h5 class="mb-4 text-center fw-semibold">Welcome Back</h5>
+    <h5 class="mb-4 text-center fw-semibold">Create an Account</h5>
     <form method="post">
         {% csrf_token %}
         {% for field in form %}
@@ -18,8 +18,8 @@
                 {% endif %}
             </div>
         {% endfor %}
-        <button type="submit" class="btn btn-primary w-100 mt-2">Login</button>
+        <button type="submit" class="btn btn-primary w-100 mt-2">Register</button>
     </form>
-    <p class="text-center mt-3 small">No account? <a href="{% url 'register' %}" style="color: var(--primary)">Register</a></p>
+    <p class="text-center mt-3 small">Already have an account? <a href="{% url 'login' %}" style="color: var(--primary)">Login</a></p>
 </div>
 {% endblock %}

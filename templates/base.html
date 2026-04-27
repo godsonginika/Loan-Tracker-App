@@ -41,9 +41,12 @@
                 <div class="user-avatar">{{ user.username|first|upper }}</div>
                 <div>
                     <div class="user-name">{{ user.username }}</div>
-                    <a href="{% url 'logout' %}" class="logout-link">
-                        <i class="bi bi-box-arrow-left"></i> Logout
-                    </a>
+                    <form method="POST" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="logout-link" style="border: none; background: none; padding: 0;">
+                            <i class="bi bi-box-arrow-left"></i> Logout
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
